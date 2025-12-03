@@ -1,7 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 # Ignore build folder
-/build/
+build/
 
 # Ignore CMake cache files
 CMakeCache.txt
