@@ -1,5 +1,6 @@
 # Ignore build folder at repo root
 /build/
+/data/
 
 # Ignore CMake cache files
 CMakeCache.txt
