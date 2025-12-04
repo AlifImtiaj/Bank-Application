@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(BankApp)
 
+find_package(fmt REQUIRED)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -16,3 +18,4 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 # Use precompiled header
 target_precompile_headers(${PROJECT_NAME} PRIVATE include/pch.h)
+target_link_libraries(BankApp PRIVATE fmt::fmt)
