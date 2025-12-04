@@ -1,11 +1,19 @@
 #include "account.h"
 
+/* need to add 
+    1. username checker
+        1. if same username found, then enter again
+        2. only letter, underscore and number allowed
+    2. email checker
+        1. no space
+        2. must have @ and dot
 
+*/
 void Account::CreateAccount() {
     // cin.ignore will ignore any leftover in the input buffer till it finds '\n'
     // its always recommended to write this when taking
     // string input after taking a std::cin input
-    // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     std::cout << "Enter full name: ";
     std::getline(std::cin, _full_name);
@@ -56,4 +64,32 @@ void Account::CreateAccount() {
 
     output_file.close();
 
+}
+
+void Account::LogIn() {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::string password;
+    std::string username;
+
+    std::cout << "Enter usename: ";
+    std::getline(std::cin, username);
+
+    std::string file_name = "data//"+username+".json";
+    std::fstream file(file_name, std::ios::in);
+    if (!file.is_open()) {
+        fmt::println("Username doesn't exists\n");
+        return;
+    }
+
+    std::cout << "Enter password: ";
+    std::getline(std::cin, password);
+
+    json dat = json::parse(file);
+    if (dat["Password"] == password) {
+        std::cout << "Password matched.\n";
+    } else {
+        std::cout << "Wrong password.\n";
+    }
+
+    file.close();
 }

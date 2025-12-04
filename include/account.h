@@ -29,4 +29,5 @@ class Account {
 
 public:
     void CreateAccount();
+    void LogIn();
 };
