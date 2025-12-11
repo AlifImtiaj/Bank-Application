@@ -1,5 +1,6 @@
 #include "account.h"
 
+#include <conio.h>
 /* need to add 
     1. username checker
         1. if same username found, then enter again
@@ -50,17 +51,19 @@ void Account::CreateAccount() {
         return;
     }
 
-    json dat;
-    dat["Name"] = _full_name;
-    dat["Date of birth"] = _date_of_birth;
-    dat["Address"] = _address;
-    dat["Gender"] = (_gender == Gender::MALE) ? "Male" : "Female";
+    json data;
+    data["Name"] = _full_name;
+    data["Date of birth"] = _date_of_birth;
+    data["Address"] = _address;
+    data["Gender"] = (_gender == Gender::MALE) ? "Male" : "Female";
 
-    dat["E-Mail"] = _email;
-    dat["Username"] = _username;
-    dat["Password"] = _password;
+    data["Balance"] = 1000;
 
-    output_file << dat.dump(4);
+    data["E-Mail"] = _email;
+    data["Username"] = _username;
+    data["Password"] = _password;
+
+    output_file << data.dump(4);
 
     output_file.close();
 
@@ -73,7 +76,8 @@ void Account::LogIn() {
 
     std::cout << "Enter usename: ";
     std::getline(std::cin, username);
-
+    _username = username;
+    // check if username is correct or not?
     std::string file_name = "data//"+username+".json";
     std::fstream file(file_name, std::ios::in);
     if (!file.is_open()) {
@@ -81,15 +85,53 @@ void Account::LogIn() {
         return;
     }
 
+
     std::cout << "Enter password: ";
     std::getline(std::cin, password);
-
-    json dat = json::parse(file);
-    if (dat["Password"] == password) {
-        std::cout << "Password matched.\n";
+    // checks if password is correct or not?
+    json data = json::parse(file);
+    if (data["Password"] == password) {
+        UserDashboard();
     } else {
         std::cout << "Wrong password.\n";
     }
 
     file.close();
+}
+
+void Account::UserDashboard() {
+    ClearScreen();
+    std::string file_name = "data//"+_username+".json";
+    std::fstream file(file_name, std::ios::in);
+    json data = json::parse(file);
+    while (true) {
+        fmt::println("======== Dashboard =========\n");
+        fmt::println("1. Check Balance");
+        fmt::println("2. Withdraw");
+        fmt::println("3. Deposit");
+        fmt::println("4. Transfer money");
+        fmt::println("5. Change Password");
+        fmt::println("6. Log out");
+        fmt::print("Enter option: ");
+        int option;
+        if (!(std::cin >> option)) {
+            option = -1; // if someone input bigger integer than int can handle
+                        // then it goes to infinity loop
+                        // to prevent that error, this part of code is written
+            std::cin.clear();
+        }
+        
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        switch (option)
+        {
+        case 1:
+            fmt::println("Balance: {}", data["Balance"].dump());
+            _getch();
+            break;
+        case 6:
+            return;
+        default:
+            break;
+        }
+    }
 }
