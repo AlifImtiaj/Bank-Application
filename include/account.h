@@ -10,6 +10,12 @@ struct Address {
     std::string country;
 };
 
+struct DateOfBirth {
+    uint16_t date;
+    uint16_t month;
+    uint16_t year;
+};
+
 // if used nlohmann::json, it will 
 // organize the json file alphabatically
 // with ordered_json, it will write the file as inserted
@@ -28,7 +34,7 @@ class Account {
     
     std::string _full_name;
 
-    std::string _date_of_birth;
+    DateOfBirth _dob;
     Gender _gender;
 
     Address _address;

@@ -15,10 +15,25 @@ int main() {
     Account ac;
 
     while(true) {
+        ClearScreen();
         std::cout << "\n============ THE GREAT ALIF IMTIAJ BANK ============\n\n";
-        std::cout << "1. Create account\n2. Log in\n3. Exit\nEnter option: ";
+        std::cout << "1. Create account\n"
+        "2. Log in\n"
+        "3. Exit\n"
+        "Enter option: ";
         int choice;
-        std::cin >> choice;
+        if (!(std::cin >> choice)) {
+            choice = -1; // if someone input bigger integer than int can handle
+                        // then it goes to infinity loop
+                        // to prevent that error, this part of code is written
+            std::cin.clear();
+        }
+
+        // cin.ignore will ignore any leftover in the input buffer till it finds '\n'
+        // its always recommended to write this when taking
+        // string input after taking a std::cin input
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
         switch (choice)
         {
         case 1:

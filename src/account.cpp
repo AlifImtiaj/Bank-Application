@@ -1,5 +1,7 @@
 #include "account.h"
 
+#include "bank.h"
+
 #include <conio.h>
 /* need to add 
     1. username checker
@@ -21,15 +23,22 @@ float ToFloat(const std::string& string) {
 
 
 void Account::CreateAccount() {
-    // cin.ignore will ignore any leftover in the input buffer till it finds '\n'
-    // its always recommended to write this when taking
-    // string input after taking a std::cin input
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
 
     std::cout << "Enter full name: ";
     std::getline(std::cin, _full_name);
-    std::cout << "Enter date of birth: ";
-    std::getline(std::cin, _date_of_birth);
+    std::cout << "Information related date of birth\n";
+    std::cout << "Enter birth-date: ";
+    std::cin >> _dob.date;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    std::cout << "Enter birth-month: ";
+    std::cin >> _dob.month;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    std::cout << "Enter birth-year: ";
+    std::cin >> _dob.year;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     // take address input;
     std::cout << "Enter house no: ";
@@ -72,9 +81,12 @@ void Account::CreateAccount() {
     }
 
     json data;
+    // putting all data in the json 
     data["Name"] = _full_name;
-    data["Date of birth"] = _date_of_birth;
-    // data["Address"] = _address;
+    data["Date of Birth"]["Day"] = _dob.date;
+    data["Date of Birth"]["Month"] = _dob.month;
+    data["Date of Birth"]["Year"] = _dob.year;
+
     data["Gender"] = (_gender == Gender::MALE) ? "Male" : "Female";
 
     data["Balance"] = 1000;
@@ -84,6 +96,8 @@ void Account::CreateAccount() {
     data["Address"]["City: "] = _address.city;
     data["Address"]["Country: "] = _address.country;
 
+    data["Account No"] = Bank::GenerateAccountId();
+
     data["E-Mail"] = _email;
     data["Username"] = _username;
     data["Password"] = _password;
@@ -91,11 +105,11 @@ void Account::CreateAccount() {
     output_file << data.dump(4);
 
     output_file.close();
-
+    std::cout << "Account created successfully. Please login\n";
+    _getch();
 }
 
 void Account::LogIn() {
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::string password;
     std::string username;
 
@@ -135,6 +149,7 @@ void Account::UserDashboard() {
     }
     file_to_read.close();
     while (true) {
+        ClearScreen();
         std::cout << "======== Dashboard =========\n\n";
         std::cout << "1. Check Balance\n";
         std::cout << "2. Withdraw\n";
@@ -156,10 +171,9 @@ void Account::UserDashboard() {
         {
         case 1: // check the current balance
             CheckBalance(file_path);
-            _getch();
             break;
         case 2:
-            // need to verify anything?
+            // withdraw
             Withdraw(file_path);
             break;
         case 3:
@@ -216,6 +230,8 @@ void Account::Withdraw(const std::string& file_path) {
     file_to_write.close();
 
     std::cout << "Withdrawal successful. New balance: " << money_in_account << "\n";
+    std::cout << "Click to continue ";
+    _getch();
 }
 
 /**
@@ -254,8 +270,13 @@ void Account::Deposit(const std::string& file_path) {
     file_to_write.close();
 
     std::cout << "Deposit successful. New balance: " << money_in_account << "\n";
+    std::cout << "Click to continue ";
+    _getch();
 }
 
+/**
+ * Read the data from the file
+ */
 void Account::CheckBalance(const std::string & file_path) {
     std::ifstream file_to_read(file_path);
 
@@ -268,7 +289,8 @@ void Account::CheckBalance(const std::string & file_path) {
     json data;
 
     file_to_read >> data;
-    std::cout << "Current Balance: " << data["Balance"];
+    std::cout << "Current Balance: " << data["Balance"] << ".\nClick to continue ";
 
+    _getch();
     file_to_read.close();
 }
