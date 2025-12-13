@@ -40,6 +40,17 @@ void Account::CreateAccount() {
     std::cin >> _dob.year;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
+    char gender = 'a';
+    while (gender != 'M' && gender != 'm' && gender != 'F' && gender != 'f') {
+        std::cout << "Enter gender: ";
+        std::cin.get(gender);   // only get one character even if multiple character is entered
+                                // suppose someone enters 'abcde', it'll only take 'a'
+        
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+
+    _gender = (gender == 'M' || gender == 'm') ? Gender::MALE : Gender::FEMALE;
+
     // take address input;
     std::cout << "Enter house no: ";
     std::getline(std::cin, _address.house_no);
@@ -52,16 +63,7 @@ void Account::CreateAccount() {
     std::cout << "Enter country: ";
     std::getline(std::cin, _address.country);
 
-    char gender = 'a';
-    while (gender != 'M' && gender != 'm' && gender != 'F' && gender != 'f') {
-        std::cout << "Enter gender: ";
-        std::cin.get(gender);   // only get one character even if multiple character is entered
-                                // suppose someone enters 'abcde', it'll only take 'a'
-        
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
 
-    _gender = (gender == 'M' || gender == 'm') ? Gender::MALE : Gender::FEMALE;
 
     std::cout << "Enter email: ";
     std::getline(std::cin, _email);
