@@ -3,8 +3,8 @@
 #include "pch.h"
 
 struct Address {
-    std::string houseNo;
-    std::string roadNo;
+    std::string house_no;
+    std::string road_no;
     std::string area;
     std::string city;
     std::string country;
@@ -40,4 +40,8 @@ public:
     void CreateAccount();
     void LogIn();
     void UserDashboard();
+
+    void Withdraw(const std::string& file_path);
+    void Deposit(const std::string& file_path);
+    void CheckBalance(const std::string& file_path);
 };

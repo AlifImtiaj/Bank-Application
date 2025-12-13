@@ -10,6 +10,16 @@
         2. must have @ and dot
 
 */
+
+float ToFloat(const std::string& string) {
+    try {
+        return std::stof(string);
+    } catch(...) {
+        return 0.0f;
+    }
+}
+
+
 void Account::CreateAccount() {
     // cin.ignore will ignore any leftover in the input buffer till it finds '\n'
     // its always recommended to write this when taking
@@ -23,20 +33,22 @@ void Account::CreateAccount() {
 
     // take address input;
     std::cout << "Enter house no: ";
+    std::getline(std::cin, _address.house_no);
     std::cout << "Enter road no: ";
+    std::getline(std::cin, _address.road_no);
     std::cout << "Enter area: ";
+    std::getline(std::cin, _address.area);
     std::cout << "Enter city: ";
+    std::getline(std::cin, _address.city);
     std::cout << "Enter country: ";
-
-
-
+    std::getline(std::cin, _address.country);
 
     char gender = 'a';
     while (gender != 'M' && gender != 'm' && gender != 'F' && gender != 'f') {
         std::cout << "Enter gender: ";
         std::cin.get(gender);   // only get one character even if multiple character is entered
                                 // suppose someone enters 'abcde', it'll only take 'a'
-            
+        
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
@@ -62,10 +74,15 @@ void Account::CreateAccount() {
     json data;
     data["Name"] = _full_name;
     data["Date of birth"] = _date_of_birth;
-    data["Address"] = _address;
+    // data["Address"] = _address;
     data["Gender"] = (_gender == Gender::MALE) ? "Male" : "Female";
 
     data["Balance"] = 1000;
+    data["Address"]["House no: "] = _address.house_no;
+    data["Address"]["Road no: "] = _address.road_no;
+    data["Address"]["Area: "] = _address.area;
+    data["Address"]["City: "] = _address.city;
+    data["Address"]["Country: "] = _address.country;
 
     data["E-Mail"] = _email;
     data["Username"] = _username;
@@ -89,7 +106,7 @@ void Account::LogIn() {
     std::string file_name = "data//"+username+".json";
     std::fstream file(file_name, std::ios::in);
     if (!file.is_open()) {
-        fmt::println("Username doesn't exists\n");
+        std::cout << "Username doesn't exists\n";
         return;
     }
 
@@ -109,18 +126,23 @@ void Account::LogIn() {
 
 void Account::UserDashboard() {
     ClearScreen();
-    std::string file_name = "data//"+_username+".json";
-    std::fstream file(file_name, std::ios::in);
-    json data = json::parse(file);
+    std::string file_path = "data//"+_username+".json";
+    std::ifstream file_to_read(file_path);
+    if (!file_to_read.is_open()) {
+        std::cout << "Critical error occured. Please try again!!!";
+        _getch();
+        return;
+    }
+    file_to_read.close();
     while (true) {
-        fmt::println("======== Dashboard =========\n");
-        fmt::println("1. Check Balance");
-        fmt::println("2. Withdraw");
-        fmt::println("3. Deposit");
-        fmt::println("4. Transfer money");
-        fmt::println("5. Change Password");
-        fmt::println("6. Log out");
-        fmt::print("Enter option: ");
+        std::cout << "======== Dashboard =========\n\n";
+        std::cout << "1. Check Balance\n";
+        std::cout << "2. Withdraw\n";
+        std::cout << "3. Deposit\n";
+        std::cout << "4. Transfer money\n";
+        std::cout << "5. Change Password\n";
+        std::cout << "6. Log out\n";
+        std::cout << "Enter option: ";
         int option;
         if (!(std::cin >> option)) {
             option = -1; // if someone input bigger integer than int can handle
@@ -128,17 +150,20 @@ void Account::UserDashboard() {
                         // to prevent that error, this part of code is written
             std::cin.clear();
         }
-        
+
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (option)
         {
         case 1: // check the current balance
-            fmt::println("Balance: {}", data["Balance"].dump());
+            CheckBalance(file_path);
             _getch();
             break;
         case 2:
+            // need to verify anything?
+            Withdraw(file_path);
             break;
         case 3:
+            Deposit(file_path);
             break;
         case 4:
             break;
@@ -150,4 +175,100 @@ void Account::UserDashboard() {
             break;
         }
     }
+}
+
+
+/**
+ * Step 1: Read content from file.
+ * parse all the content in the file to json
+ * close the file reading
+ * edit the money, save it in the json
+ * output all the json in the same folder
+ */
+void Account::Withdraw(const std::string& file_path) {
+    std::ifstream file_to_read(file_path);
+        if (!file_to_read.is_open()) {
+        std::cout << "Failed to retrive data. Please try again!!!";
+        _getch();
+        return;
+    }
+
+    json j;
+    file_to_read >> j;
+    file_to_read.close();
+
+    double money_in_account = j["Balance"];
+    double withdrawn_money = 0.0;
+
+    std::cout << "Enter amount to withdraw: ";
+    std::cin >> withdrawn_money;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    if (withdrawn_money > money_in_account) {
+        std::cout << "Insufficient balance!!\n";
+        _getch();
+        return;
+    }
+
+    std::ofstream file_to_write(file_path);
+    money_in_account -= withdrawn_money;
+    j["Balance"] = money_in_account;
+    file_to_write << j.dump(4);
+    file_to_write.close();
+
+    std::cout << "Withdrawal successful. New balance: " << money_in_account << "\n";
+}
+
+/**
+ * Step 1: Read content from file.
+ * parse all the content in the file to json
+ * close the file reading
+ * edit the money, save it in the json
+ * output all the json in the same folder
+ */
+void Account::Deposit(const std::string& file_path) {
+    std::ifstream file_to_read(file_path);
+
+    // checks if file_to_read failed or not
+    if (!file_to_read.is_open()) {
+        std::cout << "Failed to retrive data. Please try again!!!";
+        _getch();
+        return;
+    }
+
+    json j;
+    file_to_read >> j;
+    file_to_read.close();
+
+    double money_in_account = j["Balance"];
+    double deposit_money = 0.0;
+
+    std::cout << "Enter amount to deposit: ";
+    std::cin >> deposit_money;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+
+    std::ofstream file_to_write(file_path);
+    money_in_account += deposit_money;
+    j["Balance"] = money_in_account;
+    file_to_write << j.dump(4);
+    file_to_write.close();
+
+    std::cout << "Deposit successful. New balance: " << money_in_account << "\n";
+}
+
+void Account::CheckBalance(const std::string & file_path) {
+    std::ifstream file_to_read(file_path);
+
+    // checks if file_to_read failed or not
+    if (!file_to_read.is_open()) {
+        std::cout << "Failed to retrive data. Please try again!!!";
+        _getch();
+        return;
+    }
+    json data;
+
+    file_to_read >> data;
+    std::cout << "Current Balance: " << data["Balance"];
+
+    file_to_read.close();
 }

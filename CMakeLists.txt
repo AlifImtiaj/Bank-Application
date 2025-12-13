@@ -18,4 +18,3 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 # Use precompiled header
 target_precompile_headers(${PROJECT_NAME} PRIVATE include/pch.h)
-target_link_libraries(BankApp PRIVATE fmt::fmt)

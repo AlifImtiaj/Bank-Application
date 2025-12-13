@@ -5,7 +5,6 @@
 #include <fstream>
 #include <string>
 #include <limits>
-#include <fmt/core.h>
 #include <cstdlib>
 
 #include "nlohmann/json.hpp"
