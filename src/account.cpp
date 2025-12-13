@@ -20,8 +20,16 @@ void Account::CreateAccount() {
     std::getline(std::cin, _full_name);
     std::cout << "Enter date of birth: ";
     std::getline(std::cin, _date_of_birth);
-    std::cout << "Enter home address: ";
-    std::getline(std::cin, _address);
+
+    // take address input;
+    std::cout << "Enter house no: ";
+    std::cout << "Enter road no: ";
+    std::cout << "Enter area: ";
+    std::cout << "Enter city: ";
+    std::cout << "Enter country: ";
+
+
+
 
     char gender = 'a';
     while (gender != 'M' && gender != 'm' && gender != 'F' && gender != 'f') {
@@ -124,9 +132,17 @@ void Account::UserDashboard() {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (option)
         {
-        case 1:
+        case 1: // check the current balance
             fmt::println("Balance: {}", data["Balance"].dump());
             _getch();
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        case 4:
+            break;
+        case 5:
             break;
         case 6:
             return;

@@ -2,6 +2,13 @@
 
 #include "pch.h"
 
+struct Address {
+    std::string houseNo;
+    std::string roadNo;
+    std::string area;
+    std::string city;
+    std::string country;
+};
 
 // if used nlohmann::json, it will 
 // organize the json file alphabatically
@@ -24,7 +31,9 @@ class Account {
     std::string _date_of_birth;
     Gender _gender;
 
-    std::string _address;
+    Address _address;
+
+
     std::string _email;
 
 public:
