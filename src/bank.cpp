@@ -4,6 +4,9 @@
 
 using json = nlohmann::ordered_json;
 
+std::unordered_map<std::string, std::unique_ptr<UserInformation>> Bank::map_with_username;
+std::unordered_map<long long, std::unique_ptr<UserInformation>> Bank::map_with_account_no;
+
 long long Bank::GenerateAccountId()
 {
     std::ifstream file_to_read("data\\account info\\account.txt");
@@ -48,16 +51,29 @@ void Bank::InitializeMap() {
 
             map_with_username.emplace(data["Username"],
                 std::make_unique<UserInformation>(data["Username"], data["Password"], data["Account No"]));
-            map_with_account_no.emplace(data["Account No"],
-                std::make_unique<UserInformation>(data["Username"], data["Password"], data["Account No"]));
+            
+            // 
+            map_with_account_no.emplace(data["Account No"], map_with_username[data["Username"]].get());
         }
-    }
-
-    
-
+    } 
 }
 
+/**
+ * Verifies username
+ * If there already exists a user with same username, then it will return true
+ * otherwise it will return false
+ */
 bool Bank::VerifyUniqueUsername(const std::string &username)
 {
     return map_with_username.contains(username);
+}
+
+bool Bank::GetUserByAccountNo(long long account_no, std::string &username_to_return)
+{
+    username_to_return = "-1";
+    if (!map_with_account_no.contains(account_no))
+        return false;
+    
+    username_to_return = map_with_account_no.at(account_no)->username;
+    return true;
 }

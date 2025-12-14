@@ -15,18 +15,18 @@ int main() {
 
     Account ac;
 
-    Bank b;
-    b.InitializeMap();
-    std::string username;
-    std::getline(std::cin, username);
-    std::cout << b.VerifyUniqueUsername(username) << std::endl;
+    
+    // std::string username;
+    // std::getline(std::cin, username);
+    // std::cout << Bank::VerifyUniqueUsername(username) << std::endl;
 
 
-    // still in testing phase
-    return 0;
+    // // still in testing phase
+    // return 0;
 
     while(true) {
         ClearScreen();
+        Bank::InitializeMap();
         std::cout << "\n============ THE GREAT ALIF IMTIAJ BANK ============\n\n";
         std::cout << "1. Create account\n"
         "2. Log in\n"

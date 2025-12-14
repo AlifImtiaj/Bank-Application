@@ -12,11 +12,12 @@ struct UserInformation {
 
 class Bank {
 private:
-    std::unordered_map<std::string, std::unique_ptr<UserInformation>> map_with_username;
-    std::unordered_map<long long, std::unique_ptr<UserInformation>> map_with_account_no;
+    static std::unordered_map<std::string, std::unique_ptr<UserInformation>> map_with_username;
+    static std::unordered_map<long long, std::unique_ptr<UserInformation>> map_with_account_no;
 
 public:
     static long long GenerateAccountId();
-    void InitializeMap();
-    bool VerifyUniqueUsername(const std::string& username);
+    static void InitializeMap();
+    static bool VerifyUniqueUsername(const std::string& username);
+    static bool GetUserByAccountNo(long long account_no, std::string& username_to_return);
 };

@@ -5,6 +5,7 @@
 // need to port some part to bank.h and bank.cpp
 
 #include <conio.h>
+#include <filesystem>
 /* need to add 
     1. username checker
         1. if same username found, then enter again
@@ -69,14 +70,24 @@ void Account::CreateAccount() {
     std::cout << "Enter email: ";
     std::getline(std::cin, _email);
     
-    std::cout << "Enter username (for online login): ";
-    std::getline(std::cin, _username);
+    _username = "alifimtiaj"; // have to change later
+
+    // username matches with existing username, returns 1
+    // otherwise returns false
+    while (Bank::VerifyUniqueUsername(_username)) {
+        std::cout << "Enter username (for online login): ";
+        std::getline(std::cin, _username);
+    }
+
     
     std::cout << "Enter password: ";
     std::getline(std::cin, _password);
     
-    
-    std::string file_name = "data\\" + _username + ".json";
+    // only works in windows
+    // std::string file_name = "data\\" + _username + ".json";
+
+    // to make it cross platform, i dont know 
+    std::filesystem::path file_name = std::filesystem::path("data") / (_username + ".json"); // "data/alif.json"
     std::fstream output_file(file_name, std::ios::out);
     if (!output_file.is_open()) {
         std::cout << "File creating failed\n";
@@ -119,11 +130,17 @@ void Account::LogIn() {
     std::cout << "Enter usename: ";
     std::getline(std::cin, username);
     _username = username;
+    // only works in windows
+    // std::string file_name = "data//"+username+".json";
+
+
     // check if username is correct or not?
-    std::string file_name = "data//"+username+".json";
+    // crossplatform
+    std::filesystem::path file_name = std::filesystem::path("data") / (_username + ".json");
     std::fstream file(file_name, std::ios::in);
     if (!file.is_open()) {
-        std::cout << "Username doesn't exists\n";
+        std::cout << "Username doesn't exists. Click to continue ";
+        _getch();
         return;
     }
 
@@ -135,7 +152,8 @@ void Account::LogIn() {
     if (data["Password"] == password) {
         UserDashboard();
     } else {
-        std::cout << "Wrong password.\n";
+        std::cout << "Wrong password. Try again!!! Click to continue\n";
+        _getch();
     }
 
     file.close();
@@ -143,7 +161,8 @@ void Account::LogIn() {
 
 void Account::UserDashboard() {
     ClearScreen();
-    std::string file_path = "data//"+_username+".json";
+    // std::string file_path = "data//"+_username+".json";
+    std::filesystem::path file_path = std::filesystem::path("data") / (_username + ".json");
     std::ifstream file_to_read(file_path);
     if (!file_to_read.is_open()) {
         std::cout << "Critical error occured. Please try again!!!";
@@ -173,7 +192,9 @@ void Account::UserDashboard() {
         switch (option)
         {
         case 1: // check the current balance
-            CheckBalance(file_path);
+            std::cout << "Current Balance: " << CheckBalance(file_path) << std::endl;
+            std::cout << "Click to continue ";
+            _getch();
             break;
         case 2:
             // withdraw
@@ -183,6 +204,7 @@ void Account::UserDashboard() {
             Deposit(file_path);
             break;
         case 4:
+            TransferMoney(file_path);
             break;
         case 5:
             break;
@@ -202,7 +224,7 @@ void Account::UserDashboard() {
  * edit the money, save it in the json
  * output all the json in the same folder
  */
-void Account::Withdraw(const std::string& file_path) {
+void Account::Withdraw(const std::filesystem::path& file_path) {
     std::ifstream file_to_read(file_path);
         if (!file_to_read.is_open()) {
         std::cout << "Failed to retrive data. Please try again!!!";
@@ -244,7 +266,7 @@ void Account::Withdraw(const std::string& file_path) {
  * edit the money, save it in the json
  * output all the json in the same folder
  */
-void Account::Deposit(const std::string& file_path) {
+void Account::Deposit(const std::filesystem::path& file_path) {
     std::ifstream file_to_read(file_path);
 
     // checks if file_to_read failed or not
@@ -280,20 +302,80 @@ void Account::Deposit(const std::string& file_path) {
 /**
  * Read the data from the file
  */
-void Account::CheckBalance(const std::string & file_path) {
+double Account::CheckBalance(const std::filesystem::path& file_path) {
     std::ifstream file_to_read(file_path);
 
     // checks if file_to_read failed or not
     if (!file_to_read.is_open()) {
         std::cout << "Failed to retrive data. Please try again!!!";
         _getch();
-        return;
+        return -1;
     }
     json data;
 
     file_to_read >> data;
-    std::cout << "Current Balance: " << data["Balance"] << ".\nClick to continue ";
-
-    _getch();
     file_to_read.close();
+    return data["Balance"];
+}
+
+void Account::TransferMoney(const std::filesystem::path& file_path) {
+    std::string user_to_transfer_money;
+    std::cout << "Enter account no: ";
+    long long account_no;
+    std::cin >> account_no;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    if(!Bank::GetUserByAccountNo(account_no, user_to_transfer_money)) {
+        std::cout << "User not found. Click to continue ";
+        _getch();
+        return;
+    }
+    std::filesystem::path other_user_file_path = std::filesystem::path("data") / (user_to_transfer_money + ".json");
+
+    // reads the file
+    std::ifstream own_file_to_read(file_path);
+    std::ifstream other_file_to_read(other_user_file_path);
+
+    // 
+    json own_data;
+    json other_person_data;
+
+    // puts the content in the json file
+    own_file_to_read >> own_data;
+    other_file_to_read >> other_person_data;
+
+    //
+    other_file_to_read.close();
+    own_file_to_read.close();
+
+    double transfer_amount;
+    std::cout << "Enter amount to transfer: ";
+    std::cin >> transfer_amount;
+    
+    double own_money = own_data["Balance"];
+
+    if (transfer_amount > own_money) {
+        std::cout << "Insufficient Balance.\nClick to continue ";
+        _getch();
+        return;
+    }
+    
+    double other_person_money = other_person_data["Balance"];
+    own_money -= transfer_amount;
+    other_person_money += transfer_amount;
+    own_data["Balance"] = own_money;
+    other_person_data["Balance"] = other_person_money;
+    
+    std::ofstream own_file_to_write(file_path);
+    own_file_to_write << own_data.dump(4);
+    own_file_to_write.close();
+
+    std::ofstream other_file_to_write(other_user_file_path);
+    other_file_to_write << other_person_data.dump(4);
+    other_file_to_write.close();
+
+
+    std::cout << "Transferring " << transfer_amount << " was successful.\n";
+    std::cout << "New balance: " << own_data["Balance"] << ". Click to continue ";
+    _getch();
+
 }

@@ -47,7 +47,8 @@ public:
     void LogIn();
     void UserDashboard();
 
-    void Withdraw(const std::string& file_path);
-    void Deposit(const std::string& file_path);
-    void CheckBalance(const std::string& file_path);
+    void Withdraw(const std::filesystem::path& file_path);
+    void Deposit(const std::filesystem::path& file_path);
+    double CheckBalance(const std::filesystem::path& file_path);
+    void TransferMoney(const std::filesystem::path& file_path);
 };
