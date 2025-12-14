@@ -22,6 +22,8 @@
    cmake ..
    cmake --build.
    ```
-4. Run the program: ```bash ./BankApp
+4. Run the program:
+   ```bash
+   ./BankApp
 
 
