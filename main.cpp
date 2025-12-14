@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "bank.h"
 #include "account.h"
 
 #include <filesystem>
@@ -13,6 +14,16 @@ int main() {
 
 
     Account ac;
+
+    Bank b;
+    b.InitializeMap();
+    std::string username;
+    std::getline(std::cin, username);
+    std::cout << b.VerifyUniqueUsername(username) << std::endl;
+
+
+    // still in testing phase
+    return 0;
 
     while(true) {
         ClearScreen();

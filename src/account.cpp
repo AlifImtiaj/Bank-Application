@@ -26,7 +26,6 @@ float ToFloat(const std::string& string) {
 
 void Account::CreateAccount() {
 
-
     std::cout << "Enter full name: ";
     std::getline(std::cin, _full_name);
     std::cout << "Information related date of birth\n";
