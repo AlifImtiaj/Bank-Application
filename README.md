@@ -16,10 +16,11 @@
 ## Installation
 1. Clone the repository: `git clone https://github.com/yourusername/bank-application.git`
 2. Run the followings in the terminal or command prompt:
-   `mkdir build`
-   `cd build`
-   `cmake ..`
-   `cmake --build.`  
+   ```bash
+   mkdir build
+   cd build`
+   cmake ..`
+   cmake --build.`
 4. Run the program: `./bankApp`
 
 
