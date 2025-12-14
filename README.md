@@ -21,6 +21,7 @@
    cd build
    cmake ..
    cmake --build.
+   ```
 4. Run the program: ```bash ./BankApp
 
 
