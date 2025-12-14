@@ -18,9 +18,9 @@
 2. Run the followings in the terminal or command prompt:
    ```bash
    mkdir build
-   cd build`
-   cmake ..`
-   cmake --build.`
-4. Run the program: `./bankApp`
+   cd build
+   cmake ..
+   cmake --build.
+4. Run the program: ```bash ./BankApp
 
 
