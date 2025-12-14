@@ -2,6 +2,8 @@
 
 #include "bank.h"
 
+// need to port some part to bank.h and bank.cpp
+
 #include <conio.h>
 /* need to add 
     1. username checker
