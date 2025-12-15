@@ -14,7 +14,7 @@
 - Choose options to check balance, deposit, withdraw, or transfer money
 
 ## Installation
-1. Clone the repository: `git clone https://github.com/yourusername/bank-application.git`
+1. Clone the repository: `git clone https://github.com/AlifImtiaj/Bank-Application`
 2. Run the followings in the terminal or command prompt:
    ```bash
    mkdir build
