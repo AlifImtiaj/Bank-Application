@@ -65,8 +65,6 @@ void Account::CreateAccount() {
     std::cout << "Enter country: ";
     std::getline(std::cin, _address.country);
 
-
-
     std::cout << "Enter email: ";
     std::getline(std::cin, _email);
     

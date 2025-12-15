@@ -16,8 +16,8 @@ private:
     static std::unordered_map<long long, std::unique_ptr<UserInformation>> map_with_account_no;
 
 public:
-    static long long GenerateAccountId();
     static void InitializeMap();
+    static long long GenerateAccountId();
     static bool VerifyUniqueUsername(const std::string& username);
     static bool GetUserByAccountNo(long long account_no, std::string& username_to_return);
 };
