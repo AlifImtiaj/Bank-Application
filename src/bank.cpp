@@ -9,9 +9,12 @@ std::unordered_map<long long, std::unique_ptr<UserInformation>> Bank::map_with_a
 
 long long Bank::GenerateAccountId()
 {
-    std::ifstream file_to_read("data\\account info\\account.txt");
+    std::filesystem::path file_path = std::filesystem::path("data/account info/account.txt");
+    std::ifstream file_to_read(file_path);
     if (!file_to_read.is_open()) {
         std::cout << "Failed to get account file.\n";
+        std::ofstream file_to_write(file_path);
+        file_to_write << 100000000001;
         return -1;
     }
     long long next_account_number;
@@ -35,27 +38,50 @@ void Bank::InitializeMap() {
     }
     // iterates thru every file and folder in the folder path
     for (const auto& entry : fs::directory_iterator(folder_path)) {
-        // checks for if the contained item is a file or folder
-        // skip folders
-        if (fs::is_regular_file(entry)) {
-            // unsafe code - Windows only
-            // file_names.push_back(entry.path().filename().string()); // store as string
-            // std::string file_path = "data\\"+entry.path().filename().string();
+    if (fs::is_regular_file(entry)) {
 
-            // safe code. cross platform
-            fs::path file_path = folder_path / entry.path().filename(); 
-            std::ifstream file_to_read(file_path);
+        // this can be read as "data/account.json"
+        fs::path file_path = folder_path / entry.path().filename(); 
+        std::ifstream file_to_read(file_path);
+        if (!file_to_read.is_open()) {
+            std::cout << "Failed to open " << file_path << "\n";
+            continue;
+        }
+
+        try {
+            // loads all the data into an unordered map
+            // to further check for unique id and help in transaction
             json data;
-            file_to_read >> data; // putting all the data inside of the file into `data` json variable
+            file_to_read >> data;
             file_to_read.close();
 
-            map_with_username.emplace(data["Username"],
-                std::make_unique<UserInformation>(data["Username"], data["Password"], data["Account No"]));
-            
-            // 
-            map_with_account_no.emplace(data["Account No"], map_with_username[data["Username"]].get());
+            if (!data.contains("Username") || !data.contains("Password") || !data.contains("Account No")) {
+                std::cout << "Skipping invalid file: " << file_path << "\n";
+                continue;
+            }
+
+            map_with_username.emplace(
+                data["Username"].get<std::string>(),
+                std::make_unique<UserInformation>(
+                    data["Username"].get<std::string>(),
+                    data["Password"].get<std::string>(),
+                    data["Account No"].get<long long>()
+                )
+            );
+
+            map_with_account_no.emplace(
+                data["Account No"].get<long long>(),
+                map_with_username[data["Username"].get<std::string>()].get()
+            );
+
+        } catch (const json::exception& e) {
+            std::cout << "Skipping file due to JSON error: " << file_path << " - " << e.what() << "\n";
+            WaitForKeyboardInput();
+            continue;
         }
-    } 
+    }
+}
+
 }
 
 /**

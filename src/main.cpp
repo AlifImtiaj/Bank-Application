@@ -11,18 +11,7 @@ void Initialize();
 int main() {
 
     Initialize();
-
-
     Account ac;
-
-    
-    // std::string username;
-    // std::getline(std::cin, username);
-    // std::cout << Bank::VerifyUniqueUsername(username) << std::endl;
-
-
-    // // still in testing phase
-    // return 0;
 
     while(true) {
         ClearScreen();

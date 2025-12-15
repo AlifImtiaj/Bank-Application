@@ -3,8 +3,6 @@
 #include "bank.h"
 
 // need to port some part to bank.h and bank.cpp
-
-#include <conio.h>
 #include <filesystem>
 /* need to add 
     1. username checker
@@ -118,10 +116,11 @@ void Account::CreateAccount() {
 
     output_file.close();
     std::cout << "Account created successfully. Please login\n";
-    _getch();
+    WaitForKeyboardInput();
 }
 
 void Account::LogIn() {
+
     std::string password;
     std::string username;
 
@@ -135,10 +134,10 @@ void Account::LogIn() {
     // check if username is correct or not?
     // crossplatform
     std::filesystem::path file_name = std::filesystem::path("data") / (_username + ".json");
-    std::fstream file(file_name, std::ios::in);
+    std::ifstream file(file_name);
     if (!file.is_open()) {
         std::cout << "Username doesn't exists. Click to continue ";
-        _getch();
+        WaitForKeyboardInput();
         return;
     }
 
@@ -146,15 +145,15 @@ void Account::LogIn() {
     std::cout << "Enter password: ";
     std::getline(std::cin, password);
     // checks if password is correct or not?
-    json data = json::parse(file);
+    json data;
+    file >> data;
+    file.close();
     if (data["Password"] == password) {
         UserDashboard();
     } else {
         std::cout << "Wrong password. Try again!!! Click to continue\n";
-        _getch();
+        WaitForKeyboardInput();
     }
-
-    file.close();
 }
 
 void Account::UserDashboard() {
@@ -164,7 +163,7 @@ void Account::UserDashboard() {
     std::ifstream file_to_read(file_path);
     if (!file_to_read.is_open()) {
         std::cout << "Critical error occured. Please try again!!!";
-        _getch();
+        WaitForKeyboardInput();
         return;
     }
     file_to_read.close();
@@ -192,7 +191,7 @@ void Account::UserDashboard() {
         case 1: // check the current balance
             std::cout << "Current Balance: " << CheckBalance(file_path) << std::endl;
             std::cout << "Click to continue ";
-            _getch();
+            WaitForKeyboardInput();
             break;
         case 2:
             // withdraw
@@ -226,7 +225,7 @@ void Account::Withdraw(const std::filesystem::path& file_path) {
     std::ifstream file_to_read(file_path);
         if (!file_to_read.is_open()) {
         std::cout << "Failed to retrive data. Please try again!!!";
-        _getch();
+        WaitForKeyboardInput();
         return;
     }
 
@@ -242,7 +241,7 @@ void Account::Withdraw(const std::filesystem::path& file_path) {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     if (withdrawn_money > money_in_account) {
         std::cout << "Insufficient balance!!\n";
-        _getch();
+        WaitForKeyboardInput();
         return;
     }
 
@@ -254,7 +253,7 @@ void Account::Withdraw(const std::filesystem::path& file_path) {
 
     std::cout << "Withdrawal successful. New balance: " << money_in_account << "\n";
     std::cout << "Click to continue ";
-    _getch();
+    WaitForKeyboardInput();
 }
 
 /**
@@ -270,7 +269,7 @@ void Account::Deposit(const std::filesystem::path& file_path) {
     // checks if file_to_read failed or not
     if (!file_to_read.is_open()) {
         std::cout << "Failed to retrive data. Please try again!!!";
-        _getch();
+        WaitForKeyboardInput();
         return;
     }
 
@@ -294,7 +293,7 @@ void Account::Deposit(const std::filesystem::path& file_path) {
 
     std::cout << "Deposit successful. New balance: " << money_in_account << "\n";
     std::cout << "Click to continue ";
-    _getch();
+    WaitForKeyboardInput();
 }
 
 /**
@@ -306,7 +305,7 @@ double Account::CheckBalance(const std::filesystem::path& file_path) {
     // checks if file_to_read failed or not
     if (!file_to_read.is_open()) {
         std::cout << "Failed to retrive data. Please try again!!!";
-        _getch();
+        WaitForKeyboardInput();
         return -1;
     }
     json data;
@@ -324,7 +323,7 @@ void Account::TransferMoney(const std::filesystem::path& file_path) {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     if(!Bank::GetUserByAccountNo(account_no, user_to_transfer_money)) {
         std::cout << "User not found. Click to continue ";
-        _getch();
+        WaitForKeyboardInput();
         return;
     }
     std::filesystem::path other_user_file_path = std::filesystem::path("data") / (user_to_transfer_money + ".json");
@@ -353,7 +352,7 @@ void Account::TransferMoney(const std::filesystem::path& file_path) {
 
     if (transfer_amount > own_money) {
         std::cout << "Insufficient Balance.\nClick to continue ";
-        _getch();
+        WaitForKeyboardInput();
         return;
     }
     
@@ -374,6 +373,6 @@ void Account::TransferMoney(const std::filesystem::path& file_path) {
 
     std::cout << "Transferring " << transfer_amount << " was successful.\n";
     std::cout << "New balance: " << own_data["Balance"] << ". Click to continue ";
-    _getch();
+    WaitForKeyboardInput();
 
 }
