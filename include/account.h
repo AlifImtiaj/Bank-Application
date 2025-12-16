@@ -1,6 +1,6 @@
 #pragma once
-
 #include "pch.h"
+
 
 struct Address {
     std::string house_no;
@@ -51,4 +51,7 @@ public:
     void Deposit(const std::filesystem::path& file_path);
     double CheckBalance(const std::filesystem::path& file_path);
     void TransferMoney(const std::filesystem::path& file_path);
+
+private:
+    bool IsValidUsername(const std::string& username);
 };

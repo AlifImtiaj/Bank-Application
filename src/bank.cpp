@@ -89,7 +89,7 @@ void Bank::InitializeMap() {
  * If there already exists a user with same username, then it will return true
  * otherwise it will return false
  */
-bool Bank::VerifyUniqueUsername(const std::string &username)
+bool Bank::IsUsernameTaken(const std::string &username)
 {
     return map_with_username.contains(username);
 }

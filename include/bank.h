@@ -18,6 +18,6 @@ private:
 public:
     static void InitializeMap();
     static long long GenerateAccountId();
-    static bool VerifyUniqueUsername(const std::string& username);
+    static bool IsUsernameTaken(const std::string& username);
     static bool GetUserByAccountNo(long long account_no, std::string& username_to_return);
 };

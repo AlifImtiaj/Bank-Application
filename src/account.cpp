@@ -52,33 +52,79 @@ void Account::CreateAccount() {
     _gender = (gender == 'M' || gender == 'm') ? Gender::MALE : Gender::FEMALE;
 
     // take address input;
-    std::cout << "Enter house no: ";
-    std::getline(std::cin, _address.house_no);
-    std::cout << "Enter road no: ";
-    std::getline(std::cin, _address.road_no);
-    std::cout << "Enter area: ";
-    std::getline(std::cin, _address.area);
-    std::cout << "Enter city: ";
-    std::getline(std::cin, _address.city);
-    std::cout << "Enter country: ";
-    std::getline(std::cin, _address.country);
+    /**
+     * this makes sure if we press enter
+     * without inputting anything, we dont get a empty string
+     * to store in the database
+     */
+    do {
+        std::cout << "Enter house no: ";
+        std::getline(std::cin, _address.house_no);
+        if (_address.house_no.empty()) {
+            std::cout << "House no. required!!!\n";
+        }
+    } while (_address.house_no.empty());
+
+    do {
+        std::cout << "Enter road no: ";
+        std::getline(std::cin, _address.road_no);
+        if (_address.road_no.empty()) {
+            std::cout << "Road no. required!!!\n";
+        }
+    } while (_address.road_no.empty());
+    
+    do {
+        std::cout << "Enter area: ";
+        std::getline(std::cin, _address.area);
+        if (_address.area.empty()) {
+            std::cout << "Area required!!!\n";
+        }
+    } while(_address.area.empty());
+
+    do
+    {
+        std::cout << "Enter city: ";
+        std::getline(std::cin, _address.city);
+        if (_address.city.empty()) {
+            std::cout << "City required!!!\n";
+        }
+    } while (_address.city.empty());
+
+    do {
+        std::cout << "Enter country: ";
+        std::getline(std::cin, _address.country);
+        if (_address.country.empty()) {
+            std::cout << "Country required!!!\n";
+        }
+    } while (_address.country.empty());
+    
 
     std::cout << "Enter email: ";
     std::getline(std::cin, _email);
     
-    _username = "alifimtiaj"; // have to change later
 
     // username matches with existing username, returns 1
     // otherwise returns false
-    while (Bank::VerifyUniqueUsername(_username)) {
+    while (true) {
         std::cout << "Enter username (for online login): ";
         std::getline(std::cin, _username);
+        if (!IsValidUsername(_username)) {
+            std::cout << "Try to avoid any special characters except '_', '-', '.'\n";
+            continue;
+        }
+        if (!Bank::IsUsernameTaken(_username)) {
+            break;
+        }
+        std::cout << "Username already taken. Please choose another unique username!!!\n";
     }
 
-    
-    std::cout << "Enter password: ";
-    std::getline(std::cin, _password);
-    
+    do {
+        std::cout << "Enter password: ";
+        std::getline(std::cin, _password);
+        if (_password.length() < 6) {
+            std::cout << "Minimum lenght 6 required!!!\n";
+        }
+    } while (_password.length() < 6);
     // only works in windows
     // std::string file_name = "data\\" + _username + ".json";
 
@@ -375,4 +421,29 @@ void Account::TransferMoney(const std::filesystem::path& file_path) {
     std::cout << "New balance: " << own_data["Balance"] << ". Click to continue ";
     WaitForKeyboardInput();
 
+}
+
+
+/**
+ * returns true if the username is valid
+ * rule: A-Z, a-z, 0-9, only `_` `-` `.` special characters allowed
+ */
+bool Account::IsValidUsername(const std::string & username) {
+    if (username.length() < 5 || username.length() > 15) {
+        std::cout << "Username lenght out of range!!! (Min. 5 and Max. 15)";
+        return false;
+    }
+    for (size_t i = 0; i < username.length(); ++i) {
+        if (username[i] >= 'A' && username[i] <= 'Z')
+            continue;
+        else if (username[i] >= 'a' && username[i] <= 'z')
+            continue;
+        else if (username[i] >= '0' && username[i] <= '9')
+            continue;
+        else if (username[i] == '_' || username[i] == '-' || username[i] == '.')
+            continue;
+        else
+            return false;
+    }
+    return true;
 }
