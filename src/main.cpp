@@ -61,4 +61,10 @@ void Initialize() {
     if (!std::filesystem::exists("data") || !std::filesystem::is_directory("data")) {
         std::filesystem::create_directory("data");
     }
+    // this part is for account no
+    if (!std::filesystem::exists("data/account info") || !std::filesystem::is_directory("data/account info")) {
+        std::filesystem::create_directory("data/account info");
+        std::ofstream file_to_write(std::filesystem::path("data/account info/account.txt"));
+        file_to_write << 100000000000;
+    }
 }

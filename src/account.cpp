@@ -1,13 +1,8 @@
 #include "account.h"
 
 #include "bank.h"
-
-// need to port some part to bank.h and bank.cpp
 #include <filesystem>
-/* need to add 
-    1. username checker
-        1. if same username found, then enter again
-        2. only letter, underscore and number allowed
+/*
     2. email checker
         1. no space
         2. must have @ and dot
@@ -25,8 +20,13 @@ float ToFloat(const std::string& string) {
 
 void Account::CreateAccount() {
 
-    std::cout << "Enter full name: ";
-    std::getline(std::cin, _full_name);
+    do {
+        std::cout << "Enter full name: ";
+        std::getline(std::cin, _full_name);
+        if (_full_name.empty()) {
+            std::cout << "Name cannot be empty!!!\n";
+        }
+    } while (_full_name.empty());
     std::cout << "Information related date of birth\n";
     std::cout << "Enter birth-date: ";
     std::cin >> _dob.date;

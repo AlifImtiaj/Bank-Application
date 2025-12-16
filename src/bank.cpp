@@ -21,7 +21,7 @@ long long Bank::GenerateAccountId()
     file_to_read >> next_account_number;
 
     file_to_read.close();
-    std::ofstream file_to_write("data\\account info\\account.txt");
+    std::ofstream file_to_write(file_path);
     file_to_write << ++next_account_number;
 
     return next_account_number;
