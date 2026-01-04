@@ -19,6 +19,7 @@ inline void ClearScreen() {
 }
 // add any other headers that rarely change
 
+#define ADD_NEWLINE std::cout << std::endl
 
 #ifdef _WIN32
     #include <conio.h>

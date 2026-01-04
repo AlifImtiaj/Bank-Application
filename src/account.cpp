@@ -138,25 +138,25 @@ void Account::CreateAccount() {
 
     json data;
     // putting all data in the json 
-    data["Name"] = _full_name;
-    data["Date of Birth"]["Day"] = _dob.date;
-    data["Date of Birth"]["Month"] = _dob.month;
-    data["Date of Birth"]["Year"] = _dob.year;
+    data["name"] = _full_name;
+    data["date of birth"]["day"] = _dob.date;
+    data["date of birth"]["month"] = _dob.month;
+    data["date of birth"]["year"] = _dob.year;
 
-    data["Gender"] = (_gender == Gender::MALE) ? "Male" : "Female";
+    data["gender"] = (_gender == Gender::MALE) ? "Male" : "Female";
 
-    data["Balance"] = 1000;
-    data["Address"]["House no: "] = _address.house_no;
-    data["Address"]["Road no: "] = _address.road_no;
-    data["Address"]["Area: "] = _address.area;
-    data["Address"]["City: "] = _address.city;
-    data["Address"]["Country: "] = _address.country;
+    data["balance"] = 1000;
+    data["address"]["house no: "] = _address.house_no;
+    data["address"]["road no: "] = _address.road_no;
+    data["address"]["area: "] = _address.area;
+    data["address"]["city: "] = _address.city;
+    data["address"]["country: "] = _address.country;
 
-    data["Account No"] = Bank::GenerateAccountId();
+    data["account no"] = Bank::GenerateAccountId();
 
-    data["E-Mail"] = _email;
-    data["Username"] = _username;
-    data["Password"] = _password;
+    data["email"] = _email;
+    data["username"] = _username;
+    data["password"] = _password;
 
     output_file << data.dump(4);
 
@@ -182,7 +182,7 @@ void Account::LogIn() {
     std::filesystem::path file_name = std::filesystem::path("data") / (_username + ".json");
     std::ifstream file(file_name);
     if (!file.is_open()) {
-        std::cout << "Username doesn't exists. Click to continue ";
+        std::cout << "Username doesn't exists. Click to continue\n";
         WaitForKeyboardInput();
         return;
     }
@@ -194,7 +194,7 @@ void Account::LogIn() {
     json data;
     file >> data;
     file.close();
-    if (data["Password"] == password) {
+    if (data["password"] == password) {
         UserDashboard();
     } else {
         std::cout << "Wrong password. Try again!!! Click to continue\n";
@@ -224,19 +224,21 @@ void Account::UserDashboard() {
         std::cout << "6. Log out\n";
         std::cout << "Enter option: ";
         int option;
-        if (!(std::cin >> option)) {
+        if (!(std::cin >> option)) { // used ai
             option = -1; // if someone input bigger integer than int can handle
                         // then it goes to infinity loop
                         // to prevent that error, this part of code is written
             std::cin.clear();
         }
-
+        // implementation in pch.h
+        ADD_NEWLINE;
+        
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         switch (option)
         {
         case 1: // check the current balance
             std::cout << "Current Balance: " << CheckBalance(file_path) << std::endl;
-            std::cout << "Click to continue ";
+            std::cout << "Click to continue\n";
             WaitForKeyboardInput();
             break;
         case 2:
@@ -250,6 +252,7 @@ void Account::UserDashboard() {
             TransferMoney(file_path);
             break;
         case 5:
+            ChangePassword(file_path);
             break;
         case 6:
             return;
@@ -279,7 +282,7 @@ void Account::Withdraw(const std::filesystem::path& file_path) {
     file_to_read >> j;
     file_to_read.close();
 
-    double money_in_account = j["Balance"];
+    double money_in_account = j["balance"];
     double withdrawn_money = 0.0;
 
     std::cout << "Enter amount to withdraw: ";
@@ -293,12 +296,12 @@ void Account::Withdraw(const std::filesystem::path& file_path) {
 
     std::ofstream file_to_write(file_path);
     money_in_account -= withdrawn_money;
-    j["Balance"] = money_in_account;
+    j["balance"] = money_in_account;
     file_to_write << j.dump(4);
     file_to_write.close();
 
     std::cout << "Withdrawal successful. New balance: " << money_in_account << "\n";
-    std::cout << "Click to continue ";
+    std::cout << "Click to continue\n";
     WaitForKeyboardInput();
 }
 
@@ -323,7 +326,7 @@ void Account::Deposit(const std::filesystem::path& file_path) {
     file_to_read >> j;
     file_to_read.close();
 
-    double money_in_account = j["Balance"];
+    double money_in_account = j["balance"];
     double deposit_money = 0.0;
 
     std::cout << "Enter amount to deposit: ";
@@ -333,12 +336,12 @@ void Account::Deposit(const std::filesystem::path& file_path) {
 
     std::ofstream file_to_write(file_path);
     money_in_account += deposit_money;
-    j["Balance"] = money_in_account;
+    j["balance"] = money_in_account;
     file_to_write << j.dump(4);
     file_to_write.close();
 
     std::cout << "Deposit successful. New balance: " << money_in_account << "\n";
-    std::cout << "Click to continue ";
+    std::cout << "Click to continue\n";
     WaitForKeyboardInput();
 }
 
@@ -358,7 +361,7 @@ double Account::CheckBalance(const std::filesystem::path& file_path) {
 
     file_to_read >> data;
     file_to_read.close();
-    return data["Balance"];
+    return data["balance"];
 }
 
 void Account::TransferMoney(const std::filesystem::path& file_path) {
@@ -368,7 +371,7 @@ void Account::TransferMoney(const std::filesystem::path& file_path) {
     std::cin >> account_no;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     if(!Bank::GetUserByAccountNo(account_no, user_to_transfer_money)) {
-        std::cout << "User not found. Click to continue ";
+        std::cout << "User not found. Click to continue\n";
         WaitForKeyboardInput();
         return;
     }
@@ -394,19 +397,19 @@ void Account::TransferMoney(const std::filesystem::path& file_path) {
     std::cout << "Enter amount to transfer: ";
     std::cin >> transfer_amount;
     
-    double own_money = own_data["Balance"];
+    double own_money = own_data["balance"];
 
     if (transfer_amount > own_money) {
-        std::cout << "Insufficient Balance.\nClick to continue ";
+        std::cout << "Insufficient Balance.\nClick to continue\n";
         WaitForKeyboardInput();
         return;
     }
     
-    double other_person_money = other_person_data["Balance"];
+    double other_person_money = other_person_data["balance"];
     own_money -= transfer_amount;
     other_person_money += transfer_amount;
-    own_data["Balance"] = own_money;
-    other_person_data["Balance"] = other_person_money;
+    own_data["balance"] = own_money;
+    other_person_data["balance"] = other_person_money;
     
     std::ofstream own_file_to_write(file_path);
     own_file_to_write << own_data.dump(4);
@@ -418,7 +421,43 @@ void Account::TransferMoney(const std::filesystem::path& file_path) {
 
 
     std::cout << "Transferring " << transfer_amount << " was successful.\n";
-    std::cout << "New balance: " << own_data["Balance"] << ". Click to continue ";
+    std::cout << "New balance: " << own_data["balance"] << ". Click to continue\n";
+    WaitForKeyboardInput();
+}
+
+void Account::ChangePassword(const std::filesystem::path& file_path) {
+    std::ifstream file_to_read(file_path);
+    json file_data;
+    file_to_read >> file_data;
+    file_to_read.close();
+    std::string current_password;
+    std::cout << "Enter current password: ";
+    std::getline(std::cin, current_password);
+    
+    std::string user_password = file_data.at("password").get<std::string>();
+
+    if (current_password ==  user_password) {
+        std::cout << "Enter new password: ";
+        std::string new_password, repeat_password;
+        std::getline(std::cin, new_password);
+        std::cout << "Enter password again: ";
+        std::getline(std::cin, repeat_password);
+        if (new_password == repeat_password) {
+            std::ofstream file_to_write(file_path);
+            file_data["password"] = new_password;
+            file_to_write << file_data.dump(4);
+            file_to_write.close();
+            std::cout << "Password changed successfully.\n";
+            WaitForKeyboardInput();
+            return;
+        } else {
+            std::cout << "Password mismatch!!!. Click to continue\n";
+            WaitForKeyboardInput();
+            return;
+        }
+    }
+
+    std::cout << "Password not matched!!! Click to continue\n";
     WaitForKeyboardInput();
 
 }

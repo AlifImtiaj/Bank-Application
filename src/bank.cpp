@@ -55,23 +55,23 @@ void Bank::InitializeMap() {
             file_to_read >> data;
             file_to_read.close();
 
-            if (!data.contains("Username") || !data.contains("Password") || !data.contains("Account No")) {
+            if (!data.contains("username") || !data.contains("password") || !data.contains("account no")) {
                 std::cout << "Skipping invalid file: " << file_path << "\n";
                 continue;
             }
 
             map_with_username.emplace(
-                data["Username"].get<std::string>(),
+                data["username"].get<std::string>(),
                 std::make_unique<UserInformation>(
-                    data["Username"].get<std::string>(),
-                    data["Password"].get<std::string>(),
-                    data["Account No"].get<long long>()
+                    data["username"].get<std::string>(),
+                    data["password"].get<std::string>(),
+                    data["account no"].get<long long>()
                 )
             );
 
             map_with_account_no.emplace(
-                data["Account No"].get<long long>(),
-                map_with_username[data["Username"].get<std::string>()].get()
+                data["account no"].get<long long>(),
+                map_with_username[data["username"].get<std::string>()].get()
             );
 
         } catch (const json::exception& e) {
