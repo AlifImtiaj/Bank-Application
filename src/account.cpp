@@ -99,8 +99,10 @@ void Account::CreateAccount() {
     } while (_address.country.empty());
     
 
-    std::cout << "Enter email: ";
-    std::getline(std::cin, _email);
+    do {
+        std::cout << "Enter email: ";
+        std::getline(std::cin, _email);
+    } while (!IsValidEmail(_email));
     
 
     // username matches with existing username, returns 1
@@ -462,6 +464,67 @@ void Account::ChangePassword(const std::filesystem::path& file_path) {
 
 }
 
+bool Account::IsValidEmail(const std::string &email)
+{
+    bool bAFound = false;
+    bool bDotFoundAfterA = false;
+    int at_position = -1;
+
+    if (email.empty())
+        return false;
+
+    for (size_t i = 0; i < email.length(); ++i) {
+
+        // Only allowed characters
+        if (!(std::isalnum(email[i]) ||
+              email[i] == '.' ||
+              email[i] == '-' ||
+              email[i] == '_' ||
+              email[i] == '@'))
+        {
+            return false;
+        }
+
+        // Check '@'
+        if (email[i] == '@') {
+            if (bAFound)
+                return false;  // multiple @
+
+            bAFound = true;
+            at_position = i;
+        }
+
+        // Dot immediately after @
+        if (email[i] == '.' && i == at_position + 1)
+            return false;
+
+        // Dot immediately before @
+        if (email[i] == '@' && i > 0 && email[i - 1] == '.')
+            return false;
+
+        // Dot after @
+        if (bAFound && email[i] == '.')
+            bDotFoundAfterA = true;
+
+        // Cannot start with dot
+        if (i == 0 && email[i] == '.')
+            return false;
+
+        // Cannot have consecutive dots
+        if (email[i] == '.' && i > 0 && email[i - 1] == '.')
+            return false;
+
+        // Cannot end with dot
+        if (i == email.length() - 1 && email[i] == '.')
+            return false;
+    }
+
+    // Final structural validation
+    if (!bAFound || !bDotFoundAfterA || at_position == 0 || at_position == email.length() - 1)
+        return false;
+
+    return true;
+}
 
 /**
  * returns true if the username is valid
@@ -486,3 +549,4 @@ bool Account::IsValidUsername(const std::string & username) {
     }
     return true;
 }
+

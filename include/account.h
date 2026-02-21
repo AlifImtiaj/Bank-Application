@@ -54,5 +54,6 @@ public:
     void ChangePassword(const std::filesystem::path& file_path);
 
 private:
+    bool IsValidEmail(const std::string& email);
     bool IsValidUsername(const std::string& username);
 };
